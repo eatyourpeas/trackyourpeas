@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
 import axios from 'axios';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 let gistId: string | undefined;
 
@@ -85,7 +89,7 @@ function formatTime(seconds: number): string {
 }
 
 async function saveResultToGist(result: string) {
-    const token = 'YOUR_GITHUB_PERSONAL_ACCESS_TOKEN';
+    const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;;
     const gistData = {
         description: "Track Your Peas Timer Result",
         public: false,
