@@ -12,7 +12,7 @@ let endTime: Date | undefined;
 let githubUsername: string | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
-    console.log('Congratulations, your extension "trackyourpeas" is now active!');
+    vscode.window.showInformationMessage('Congratulations, your extension "trackyourpeas" is now active!');
 
     let tracking = false;
     let paused = false;
