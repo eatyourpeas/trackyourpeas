@@ -3,17 +3,23 @@ import axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Load environment variables from .env file in src/env directory
+dotenv.config({ path: path.join(__dirname, 'env', '.env') });
 
 let gistId: string | undefined;
+let startTime: Date | undefined;
+let endTime: Date | undefined;
+let githubUsername: string | undefined;
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "trackyourpeas" is now active!');
 
     let tracking = false;
     let paused = false;
     let elapsedSeconds = 0;
     let interval: NodeJS.Timeout | undefined;
+	// Fetch GitHub username
+    const githubUsername = await fetchGitHubUsername();
 
     const startStop = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     startStop.tooltip = 'Start tracking your peas...';
@@ -32,6 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
             // Stop tracking
             tracking = false;
             paused = false;
+            endTime = new Date();
             const result = formatTime(elapsedSeconds);
             elapsedSeconds = 0;
             startStop.text = '$(notebook-execute) Start Tracking';
@@ -40,12 +47,16 @@ export function activate(context: vscode.ExtensionContext) {
             if (interval) {
                 clearInterval(interval);
             }
-            await saveResultToGist(result);
+			await fetchGitHubUsername();
+			const {repoName, branchName} = await getRepoAndBranch();
+            const totalCommits = await countCommits(`${repoName}/${branchName}`);
+            await saveResultToGist(githubUsername, result, totalCommits, repoName, branchName);
         } else {
             // Start tracking
             tracking = true;
             paused = false;
             elapsedSeconds = 0;
+            startTime = new Date();
             startStop.text = '$(primitive-square) Stop Tracking';
             startStop.tooltip = 'Stop tracking your peas...';
             pause.show();
@@ -79,6 +90,8 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(pauseCommand);
     context.subscriptions.push(startStop);
     context.subscriptions.push(pause);
+
+    
 }
 
 function formatTime(seconds: number): string {
@@ -88,14 +101,23 @@ function formatTime(seconds: number): string {
     return `${hours}:${minutes}:${secs}`;
 }
 
-async function saveResultToGist(result: string) {
-    const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;;
+async function saveResultToGist(githubUsername: string, result: string, totalCommits: number, repoName: string | null, branchName: string | null) {
+    const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;
+    if (!token) {
+        vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
+        return;
+    }
+
     const gistData = {
         description: "Track Your Peas Timer Result",
         public: false,
         files: {
             "timer-result.txt": {
-                content: `Elapsed Time: ${result}`
+				user: `${githubUsername}`,
+                content: `Elapsed Time: ${result}`,
+				repository: `${branchName}`,
+				branch: `${branchName}`,
+				totalCommits: `${totalCommits}`
             }
         }
     };
@@ -124,5 +146,80 @@ async function saveResultToGist(result: string) {
         console.error(error);
     }
 }
+
+async function fetchGitHubUsername() {
+    const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;
+    if (!token) {
+        vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
+        return;
+    }
+
+    try {
+        const response = await axios.get('https://api.github.com/user', {
+            headers: {
+                'Authorization': `token ${token}`
+            }
+        });
+        return response.data.login;
+    } catch (error) {
+        vscode.window.showErrorMessage('Failed to fetch GitHub username.');
+        console.error(error);
+    }
+}
+
+async function countCommits(repositoryAndBranchName: string) {
+    const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;
+    if (!token) {
+        vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
+        return;
+    }
+
+    if (!startTime || !endTime) {
+        vscode.window.showErrorMessage('Start time or end time is not set.');
+        return;
+    }
+
+    if (!githubUsername) {
+        vscode.window.showErrorMessage('GitHub username is not set.');
+        return;
+    }
+
+    const repoName = repositoryAndBranchName;
+    const since = startTime.toISOString();
+    const until = endTime.toISOString();
+
+    try {
+        const response = await axios.get(`https://api.github.com/repos/${githubUsername}/${repoName}/commits`, {
+            headers: {
+                'Authorization': `token ${token}`
+            },
+            params: {
+                since: since,
+                until: until
+            }
+        });
+
+        return response.data.length;
+    } catch (error) {
+        vscode.window.showErrorMessage('Failed to count commits.');
+        console.error(error);
+    }
+}
+
+async function getRepoAndBranch() {
+    const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
+    const api = gitExtension?.getAPI(1);
+    const repo = api?.repositories[0];
+
+    if (!repo) {
+        return { repoName: null, branchName: null };
+    }
+
+    const repoName = path.basename(repo.rootUri.fsPath);
+    const branchName = repo.state.HEAD?.name;
+
+    return { repoName, branchName };
+}
+
 
 export function deactivate() {}
