@@ -4,12 +4,14 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 // Load environment variables from .env file in src/env directory
-dotenv.config({ path: path.join(__dirname, 'env', '.env') });
+dotenv.config({ path: path.join(__dirname, '..', 'envs', '.env') });
 
 let gistId: string | undefined;
 let startTime: Date | undefined;
 let endTime: Date | undefined;
 let githubUsername: string | undefined;
+// let repoName: string | undefined;
+// let branchName: string | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
     vscode.window.showInformationMessage('Congratulations, your extension "trackyourpeas" is now active!');
@@ -18,8 +20,9 @@ export async function activate(context: vscode.ExtensionContext) {
     let paused = false;
     let elapsedSeconds = 0;
     let interval: NodeJS.Timeout | undefined;
+    let totalCommits = 0;
 	// Fetch GitHub username
-    const githubUsername = await fetchGitHubUsername();
+    githubUsername = await fetchGitHubUsername();
 
     const startStop = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     startStop.tooltip = 'Start tracking your peas...';
@@ -47,10 +50,16 @@ export async function activate(context: vscode.ExtensionContext) {
             if (interval) {
                 clearInterval(interval);
             }
-			await fetchGitHubUsername();
-			const {repoName, branchName} = await getRepoAndBranch();
-            const totalCommits = await countCommits(`${repoName}/${branchName}`);
-            await saveResultToGist(githubUsername, result, totalCommits, repoName, branchName);
+            const { repoName, branchName } = await getRepoAndBranch();
+            
+            if (!repoName || !branchName) {
+                vscode.window.showErrorMessage('Failed to get repository and branch name.');
+                return;
+            } 
+            if (githubUsername){
+                totalCommits = await countCommits(repoName, `${repoName}/${branchName}`);
+                await saveResultToGist(githubUsername, result, totalCommits, repoName, branchName);
+            }
         } else {
             // Start tracking
             tracking = true;
@@ -167,7 +176,7 @@ async function fetchGitHubUsername() {
     }
 }
 
-async function countCommits(repositoryAndBranchName: string) {
+async function countCommits(githubUsername: string, repositoryAndBranchName: string) {
     const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;
     if (!token) {
         vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
