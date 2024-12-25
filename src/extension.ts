@@ -2,27 +2,28 @@ import * as vscode from 'vscode';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { log } from 'console';
 
 // Load environment variables from .env file in src/env directory
 dotenv.config({ path: path.join(__dirname, '..', 'envs', '.env') });
+// Create an OutputChannel
+const outputChannel = vscode.window.createOutputChannel('trackyourpeas');
 
 let gistId: string | undefined;
 let startTime: Date | undefined;
 let endTime: Date | undefined;
 let githubUsername: string | undefined;
-// let repoName: string | undefined;
-// let branchName: string | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
-    vscode.window.showInformationMessage('Congratulations, your extension "trackyourpeas" is now active!');
+    const { repoName, branchName } = await getRepoAndBranch();
+    githubUsername = await fetchGitHubUsername();
+    vscode.window.showInformationMessage(`Congratulations ${githubUsername}, your extension "trackyourpeas" is now active! Repo: ${repoName}, Branch: ${branchName}`);
 
     let tracking = false;
     let paused = false;
     let elapsedSeconds = 0;
     let interval: NodeJS.Timeout | undefined;
     let totalCommits = 0;
-	// Fetch GitHub username
-    githubUsername = await fetchGitHubUsername();
 
     const startStop = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     startStop.tooltip = 'Start tracking your peas...';
@@ -50,14 +51,14 @@ export async function activate(context: vscode.ExtensionContext) {
             if (interval) {
                 clearInterval(interval);
             }
-            const { repoName, branchName } = await getRepoAndBranch();
+            
             
             if (!repoName || !branchName) {
                 vscode.window.showErrorMessage('Failed to get repository and branch name.');
                 return;
             } 
             if (githubUsername){
-                totalCommits = await countCommits(repoName, `${repoName}/${branchName}`);
+                totalCommits = await countCommits(githubUsername, repoName, branchName);
                 await saveResultToGist(githubUsername, result, totalCommits, repoName, branchName);
             }
         } else {
@@ -119,12 +120,12 @@ async function saveResultToGist(githubUsername: string, result: string, totalCom
 
     const gistData = {
         description: "Track Your Peas Timer Result",
-        public: false,
+        public: true,
         files: {
             "timer-result.txt": {
 				user: `${githubUsername}`,
                 content: `Elapsed Time: ${result}`,
-				repository: `${branchName}`,
+				repository: `${repoName}`,
 				branch: `${branchName}`,
 				totalCommits: `${totalCommits}`
             }
@@ -176,7 +177,7 @@ async function fetchGitHubUsername() {
     }
 }
 
-async function countCommits(githubUsername: string, repositoryAndBranchName: string) {
+async function countCommits(githubUsername: string, repoName: string, branchName: string) {
     const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;
     if (!token) {
         vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
@@ -193,7 +194,7 @@ async function countCommits(githubUsername: string, repositoryAndBranchName: str
         return;
     }
 
-    const repoName = repositoryAndBranchName;
+    
     const since = startTime.toISOString();
     const until = endTime.toISOString();
 
@@ -203,6 +204,7 @@ async function countCommits(githubUsername: string, repositoryAndBranchName: str
                 'Authorization': `token ${token}`
             },
             params: {
+                sha: branchName,
                 since: since,
                 until: until
             }
@@ -210,7 +212,7 @@ async function countCommits(githubUsername: string, repositoryAndBranchName: str
 
         return response.data.length;
     } catch (error) {
-        vscode.window.showErrorMessage('Failed to count commits.');
+        vscode.window.showErrorMessage(`Failed to count commits. ${error} ${repoName} ${branchName} ${githubUsername} ${token}`);
         console.error(error);
     }
 }
