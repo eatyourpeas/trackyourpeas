@@ -29,8 +29,8 @@ This should not add anything else to your machine, apart from Axios. Runs on nod
 
 You will need a personal access token to get it working. To do this go to your github settings > developer > personal access tokens. Create a new token with the key: `GITHUB_TOKEN_TRACK_YOUR_PEAS` and save in a new `.env` file in the `envs`
 
-[!IMPORTANT]
-DO NOT COMMIT THIS TO GIT. ADD THE FILE TO .GITIGNORE
+> [!IMPORTANT]
+> DO NOT COMMIT THIS TO GIT. ADD THE FILE TO .GITIGNORE
 
 ## Known Issues
 
