@@ -8,11 +8,14 @@ So track my peas is a personal tool to track my work. There are plenty of tracke
 
 Track your peas is a simple time tracker, with a start/stop/pause toggle that sits unobtrusively in your activity bar at the bottom. It stores the times in a Gist, so you will need a personal access token to make it work, and have access t'internet (obvs). If you don't want people to see what you are doing, you will need a private Gist I guess.
 
-<!-- For example if there is an image subfolder under your extension project workspace:
+On stopping the timer, a summary of the last session will be published to a gist called `summary.md`
 
-\!\[feature X\]\(images/feature-x.png\) -->
+It looks like this:
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Summary
+| Date       | Time       | Session Start Time | Session End Time | Session Duration | Repository | Branch     |
+|------------|------------|--------------------|------------------|------------------|------------|------------|
+| Wed Dec 25 2024    | 12:28:06    | Wed Dec 25 2024 12:28:06 GMT+0000 (Greenwich Mean Time)       | Wed Dec 25 2024 12:28:06 GMT+0000 (Greenwich Mean Time)       | 00:00:12   | rcpch-nhs-organisations| live |
 
 ## Requirements
 
@@ -22,7 +25,10 @@ All in the package.json...
 
 This should not add anything else to your machine, apart from Axios.
 
-You will need a personal access token to get it working
+You will need a personal access token to get it working. To do this go to your github settings > developer > personal access tokens. Create a new token with the key: `GITHUB_TOKEN_TRACK_YOUR_PEAS` and save in a new `.env` file in the `envs`
+
+[!IMPORTANT]
+DO NOT COMMIT THIS TO GIT. ADD THE FILE TO .GITIGNORE
 
 ## Known Issues
 
@@ -33,24 +39,5 @@ Intial commit!
 Initial commit!
 
 ---
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Track them peas...**
