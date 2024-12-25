@@ -8,6 +8,7 @@
     "name": "eatyourpeas",
     "email": "simon@eatyourpeas.co.uk"
   },
+  "license": "MIT",
   "categories": [
     "Other"
   ],
@@ -26,7 +27,7 @@
   },
   "pricing": "Free",
   "engines": {
-    "vscode": "^1.0.0"
+    "vscode": "^1.96.0"
   },
   "main": "./dist/extension.js",
   "activationEvents": [
