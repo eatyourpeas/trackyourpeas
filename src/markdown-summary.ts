@@ -1,4 +1,4 @@
-export const markdownSummary = (endTime: string, elapsedTime: string, repoName: string | null, branchName:string | null, is_addition:boolean): string => {
+export const markdownSummary = (endTime: Date, elapsedTime: string, repoName: string | null, branchName:string | null, is_addition:boolean): string => {
     /*
     Function to generate a markdown summary of the tracking session.
     It takes the elapsed time, repository name, and branch name as arguments.

@@ -6,7 +6,7 @@ So track my peas is a personal tool to track my work. There are plenty of tracke
 
 ## Features
 
-Track your peas is a simple time tracker, with a start/stop/pause toggle that sits unobtrusively in your activity bar at the bottom. It stores the times in a Gist, so you will need a personal access token to make it work, and have access t'internet (obvs). If you don't want people to see what you are doing, you will need a private Gist I guess.
+Track your peas is a simple time tracker, with a start/stop/pause toggle that sits unobtrusively in your activity bar at the bottom. It stores the times in a Gist as a markdown table of the time you have spent each session with the name of the repository and branch, so you will need a personal access token to make it work, and have access t'internet (obvs). If you don't want people to see what you are doing, you will need a private Gist I guess.
 
 On stopping the timer, a summary of the last session will be published to a gist called `summary.md`
 
@@ -19,7 +19,8 @@ It looks like this:
 
 ## Requirements
 
-All in the package.json...
+A personal access token scoped to read/write access to Gists
+Otherwise, all in the package.json...
 
 ## Extension Settings
 
@@ -40,4 +41,5 @@ Initial commit!
 
 ---
 
+This is still very much in trial phase. Please do not use for anything important yet.
 **Track them peas...**

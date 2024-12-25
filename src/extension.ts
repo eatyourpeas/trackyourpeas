@@ -6,8 +6,6 @@ import  { markdownSummary } from './markdown-summary';
 
 // Load environment variables from .env file in src/env directory
 dotenv.config({ path: path.join(__dirname, '..', 'envs', '.env') });
-// Create an OutputChannel
-const outputChannel = vscode.window.createOutputChannel('trackyourpeas');
 
 let gistId: string | undefined;
 let startTime: Date | undefined;
@@ -23,7 +21,6 @@ export async function activate(context: vscode.ExtensionContext) {
     let paused = false;
     let elapsedSeconds = 0;
     let interval: NodeJS.Timeout | undefined;
-    let totalCommits = 0;
 
     const startStop = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     startStop.tooltip = 'Start tracking your peas...';
@@ -110,7 +107,7 @@ function formatTime(seconds: number): string {
     return `${hours}:${minutes}:${secs}`;
 }
 
-async function saveResultToGist(githubUsername: string, endTime: string, result: string, repoName: string | null, branchName: string | null) {
+async function saveResultToGist(githubUsername: string, endTime: Date, result: string, repoName: string | null, branchName: string | null) {
     const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;
     if (!token) {
         vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
@@ -118,18 +115,14 @@ async function saveResultToGist(githubUsername: string, endTime: string, result:
     }
 
     let gistData = {
-        description: "Track Your Peas Timer Result",
+        description: "Track Your Peas Summary",
         public: true,
         files: {
-            "timer-result.md": {
-				user: `${githubUsername}`,
-                content: `Elapsed Time: ${result}`,
-				repository: `${repoName}`,
-				branch: `${branchName}`,
-            },
             "summary.md": {
                 user: `${githubUsername}`,
                 content: markdownSummary(endTime, result, repoName, branchName, gistId ? true : false),
+                repository: `${repoName}`,
+                branch: `${branchName}`,
             }
         }
     };
