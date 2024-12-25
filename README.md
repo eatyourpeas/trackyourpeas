@@ -1,6 +1,6 @@
 # Track your peas...
 
-Like a lot of people, I use VS Code. I spend a lot of term there, and after a while you like to set things up the way you like them. I have for some time wanted to track the time I spend, mostly to prove that I am providing value to the people I work for, but also to see for my self when I work, for how long, that kind of thing. And I have two machines and alternate between them so need something that tracks activity across all instances.
+Like a lot of people, I use VS Code. I spend a lot of time there, and after a while you like to set things up the way you like them. I have for some time wanted to track the time I spend, mostly to prove that I am providing value to the people I work for, but also to see for my self when I work, for how long, that kind of thing. And I have two machines and alternate between them so need something that tracks activity across all instances.
 
 So track my peas is a personal tool to track my work. There are plenty of trackers out there but they either sit only on the local machine or you need to get an API key and pay a subscription. That is way overkill for me, and I don't want to pay for stuff like this. 
 
