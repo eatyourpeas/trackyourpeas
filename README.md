@@ -13,6 +13,7 @@ On stopping the timer, a summary of the last session will be published to a gist
 It looks like this:
 
 ## Summary
+
 | Date       | Time       | Session Start Time | Session End Time | Session Duration | Repository | Branch     |
 |------------|------------|--------------------|------------------|------------------|------------|------------|
 | Wed Dec 25 2024    | 12:28:06    | Wed Dec 25 2024 12:28:06 GMT+0000 (Greenwich Mean Time)       | Wed Dec 25 2024 12:28:06 GMT+0000 (Greenwich Mean Time)       | 00:00:12   | rcpch-nhs-organisations| live |

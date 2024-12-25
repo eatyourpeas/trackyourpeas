@@ -23,7 +23,7 @@ export const markdownSummary = (endTime: Date, elapsedTime: string, repoName: st
     const now = new Date();
     const date = now.toDateString();
     const time = now.toLocaleTimeString();
-    const title = `## Summary
+    const title = `## Summary \n
 | Date       | Time       | Session Start Time | Session End Time | Session Duration | Repository | Branch     |`;
     const summaryRowDivider = ` |------------|------------|--------------------|------------------|------------------|------------|------------|`
     const summaryRow = `| ${date}    | ${time}    | ${startTime}       | ${endTime}       | ${elapsedTime}   | ${repoName || 'N/A'}| ${branchName || 'N/A'} |`;
