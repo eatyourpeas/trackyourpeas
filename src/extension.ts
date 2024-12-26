@@ -1,20 +1,26 @@
 import * as vscode from 'vscode';
-import axios from 'axios';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
-import  { markdownSummary } from './markdown-summary';
+// import * as dotenv from 'dotenv';
+import { fetchGitHubUsername, getGitHubToken } from './credentials';
+import { getRepoAndBranch } from './credentials';
+import { saveResultToGist } from './gist';
 
 // Load environment variables from .env file in src/env directory
-dotenv.config({ path: path.join(__dirname, '..', 'envs', '.env') });
+// dotenv.config({ path: path.join(__dirname, '..', 'envs', '.env') });
 
-let gistId: string | undefined;
+
 let startTime: Date | undefined;
 let endTime: Date | undefined;
 let githubUsername: string | undefined;
+let token: string | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
     const { repoName, branchName } = await getRepoAndBranch();
-    githubUsername = await fetchGitHubUsername();
+    token = await getGitHubToken(context=context);
+    githubUsername = await fetchGitHubUsername(token=token);
+    if (!token) {
+        vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
+        return;
+    }
     vscode.window.showInformationMessage(`Congratulations ${githubUsername}, your extension "trackyourpeas" is now active! Repo: ${repoName}, Branch: ${branchName}`);
 
     let tracking = false;
@@ -55,7 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 return;
             } 
             if (githubUsername){
-                await saveResultToGist(githubUsername, endTime, result, repoName, branchName);
+                await saveResultToGist(token, githubUsername, endTime, result, repoName, branchName);
             }
         } else {
             // Start tracking
@@ -107,85 +113,9 @@ function formatTime(seconds: number): string {
     return `${hours}:${minutes}:${secs}`;
 }
 
-async function saveResultToGist(githubUsername: string, endTime: Date, result: string, repoName: string | null, branchName: string | null) {
-    const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;
-    if (!token) {
-        vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
-        return;
-    }
-
-    let gistData = {
-        description: "Track Your Peas Summary",
-        public: true,
-        files: {
-            "summary.md": {
-                user: `${githubUsername}`,
-                content: markdownSummary(endTime, result, repoName, branchName, gistId ? true : false),
-                repository: `${repoName}`,
-                branch: `${branchName}`,
-            }
-        }
-    };
-
-    try {
-        let response;
-        if (gistId) {
-            // Update existing Gist
-            response = await axios.patch(`https://api.github.com/gists/${gistId}`, gistData, {
-                headers: {
-                    'Authorization': `token ${token}`
-                }
-            });
-        } else {
-            // Create new Gist
-            response = await axios.post('https://api.github.com/gists', gistData, {
-                headers: {
-                    'Authorization': `token ${token}`
-                }
-            });
-            gistId = response.data.id;
-        }
-        vscode.window.showInformationMessage('Timer result saved to GitHub Gist!');
-    } catch (error) {
-        vscode.window.showErrorMessage('Failed to save timer result to GitHub Gist.');
-        console.error(error);
-    }
-}
-
-async function fetchGitHubUsername() {
-    const token = process.env.GITHUB_TOKEN_TRACK_YOUR_PEAS;
-    if (!token) {
-        vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
-        return;
-    }
-
-    try {
-        const response = await axios.get('https://api.github.com/user', {
-            headers: {
-                'Authorization': `token ${token}`
-            }
-        });
-        return response.data.login;
-    } catch (error) {
-        vscode.window.showErrorMessage('Failed to fetch GitHub username.');
-        console.error(error);
-    }
-}
-
-async function getRepoAndBranch() {
-    const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
-    const api = gitExtension?.getAPI(1);
-    const repo = api?.repositories[0];
-
-    if (!repo) {
-        return { repoName: null, branchName: null };
-    }
-
-    const repoName = path.basename(repo.rootUri.fsPath);
-    const branchName = repo.state.HEAD?.name;
-
-    return { repoName, branchName };
-}
-
-
 export function deactivate() {}
+
+module.exports = {
+    activate,
+    deactivate
+};

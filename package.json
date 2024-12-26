@@ -21,6 +21,15 @@
   },
   "homepage": "https://github.com/eatyourpeas/trackyourpeas/blob/main/README.md",
   "icon": "images/icon.png",
+  "configuration": {
+        "properties": {
+            "trackyourpeas.secretStorage": {
+                "type": "object",
+                "default": {},
+                "description": "Secret storage for Track Your Peas extension"
+            }
+        }
+    },
   "galleryBanner": {
     "color": "#8db55b",
     "theme": "dark"
