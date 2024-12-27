@@ -97,7 +97,7 @@ export async function activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(pauseCommand);
         context.subscriptions.push(startStop);
         context.subscriptions.push(pause);
-    } catch (error) {
+    } catch (error: any) {
         vscode.window.showErrorMessage(`Error: ${error.message}`);
     }
     
