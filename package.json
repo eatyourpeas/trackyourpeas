@@ -22,14 +22,14 @@
   "homepage": "https://github.com/eatyourpeas/trackyourpeas/blob/main/README.md",
   "icon": "images/icon.png",
   "configuration": {
-        "properties": {
-            "trackyourpeas.secretStorage": {
-                "type": "object",
-                "default": {},
-                "description": "Secret storage for Track Your Peas extension"
-            }
-        }
-    },
+    "properties": {
+      "trackyourpeas.secretStorage": {
+        "type": "object",
+        "default": {},
+        "description": "Secret storage for Track Your Peas extension"
+      }
+    }
+  },
   "galleryBanner": {
     "color": "#8db55b",
     "theme": "dark"
@@ -55,15 +55,21 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
-  },
+    "compile": "npm run check-types && node esbuild.js",
+    "check-types": "tsc --noEmit",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "vscode:prepublish": "npm run package",
+    "package": "npm run check-types && node esbuild.js --production"
+},
   "devDependencies": {
     "@types/node": "^22.10.2",
     "@types/vscode": "1.95.0",
+    "esbuild": "^0.24.2",
     "tslint": "^6.1.3",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "npm-run-all": "^4.1.5"
   },
   "dependencies": {
     "axios": "^1.7.8"
