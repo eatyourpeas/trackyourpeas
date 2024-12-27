@@ -2,7 +2,7 @@
   "name": "trackyourpeas",
   "displayName": "Track Your Peas",
   "description": "A VS Code extension to track your VSCode activity using Github gists.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "eatyourpeas",
   "author": {
     "name": "eatyourpeas",
