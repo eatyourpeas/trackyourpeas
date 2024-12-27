@@ -2,7 +2,7 @@
 
 Like a lot of people, I use VS Code. I spend a lot of time there, and after a while you like to set things up the way you like them. I have for some time wanted to track the time I spend, mostly to prove that I am providing value to the people I work for, but also to see for my self when I work, for how long, that kind of thing. And I have two machines and alternate between them so need something that tracks activity across all instances.
 
-So track my peas is a personal tool to track my work. There are plenty of trackers out there but they either sit only on the local machine or you need to get an API key and pay a subscription. That is way overkill for me, and I don't want to pay for stuff like this. 
+So Track Your Peas is a personal tool to track my work. There are plenty of trackers out there but they either sit only on the local machine or you need to get an API key and pay a subscription. That is way overkill for me, and I don't want to pay for stuff like this.
 
 ## Features
 
@@ -27,14 +27,13 @@ Otherwise, all in the package.json...
 
 This should not add anything else to your machine, apart from Axios. Runs on node 22.
 
-You will need a personal access token to get it working. To do this go to your github settings > developer > personal access tokens. Create a new token with the key: `GITHUB_TOKEN_TRACK_YOUR_PEAS` and save in a new `.env` file in the `envs`
+You will need a personal access token to get it working. To do this go to your github settings > developer > personal access tokens. Create a new token with the key: `GITHUB_TOKEN_TRACK_YOUR_PEAS` and keep a record of it somewhere safe.
 
-> [!IMPORTANT]
-> DO NOT COMMIT THIS TO GIT. ADD THE FILE TO .GITIGNORE
+On first use a dialog box will request this and store it in VSCode secret storage.
 
 ## Known Issues
 
-Intial commit!
+see [issues](https://github.com/eatyourpeas/trackyourpeas/issues)
 
 ## Release Notes
 
