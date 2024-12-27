@@ -30,7 +30,7 @@ export const markdownSummary = (endTime: Date, elapsedTime: string, repoName: st
 
     let summary = '';
     if (is_addition){
-        summary = summaryRowDivider + '\n' + summaryRow + '\n';
+        summary = summaryRow + '\n';
     } else{
         summary = title + '\n' + summaryRowDivider + '\n' + summaryRow + '\n';
     }

@@ -1,10 +1,8 @@
 import * as vscode from 'vscode';
 import axios from 'axios';
 import { markdownSummary } from './markdown-summary';
-import { getGitHubToken } from './credentials';
 
-
-let gistId: string | undefined;
+const GITHUB_API_URL = 'https://api.github.com';
 
 export async function saveResultToGist(token: string|undefined, githubUsername: string, endTime: Date, result: string, repoName: string | null, branchName: string | null) {
     if (!token) {
@@ -12,13 +10,54 @@ export async function saveResultToGist(token: string|undefined, githubUsername: 
         return;
     }
 
+    let gistId: string | null = null;
+    let existingGistContent: string | null = null;
+
+    //  Fetch all Gists
+    try {
+        // Fetch existing gists
+        const response = await axios.get(`${GITHUB_API_URL}/gists`, {
+            headers: {
+                'Authorization': `token ${token}`
+            }
+        });
+
+        const gists = response.data;
+
+        // Check if a gist with the specified filename exists
+        for (const gist of gists) {
+            if (gist.files && gist.files["Track Your Peas Summary.md"]) {
+                gistId = gist.id;
+                break;
+            }
+        }
+
+        // Fetch existing gist content
+        if (gistId) {
+            // Fetch existing Gist content
+                const gistResponse = await axios.get(`${GITHUB_API_URL}/gists/${gistId}`, {
+                    headers: {
+                        'Authorization': `token ${token}`
+                    }
+                });
+                existingGistContent = gistResponse.data.files["Track Your Peas Summary.md"].content;
+            }
+    } catch (error) {
+        vscode.window.showErrorMessage('Failed to fetch GitHub Gists.');
+        console.error(error);
+        return;
+    }
+
+    const newGistContent = markdownSummary(endTime, result, repoName, branchName, gistId ? true : false);
+    const combinedContent = gistId ? `${existingGistContent}${newGistContent}` : newGistContent;
+
     let gistData = {
         description: "Track Your Peas Summary",
         public: true,
         files: {
-            "summary.md": {
+            "Track Your Peas Summary.md": {
                 user: `${githubUsername}`,
-                content: markdownSummary(endTime, result, repoName, branchName, gistId ? true : false),
+                content: combinedContent,
                 repository: `${repoName}`,
                 branch: `${branchName}`,
             }
