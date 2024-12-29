@@ -18,6 +18,21 @@ export async function getGitHubToken(context: vscode.ExtensionContext): Promise<
     return token;
 }
 
+export async function updateGitHubToken(context: vscode.ExtensionContext): Promise<void> {
+    const secretStorage = context.secrets;
+    const token = await vscode.window.showInputBox({
+        prompt: 'Enter your GitHub Personal Access Token',
+        ignoreFocusOut: true,
+        password: true
+    });
+    if (token) {
+        await secretStorage.store('GITHUB_TOKEN_TRACK_YOUR_PEAS', token);
+        vscode.window.showInformationMessage('GitHub PAT updated successfully.');
+    } else {
+        vscode.window.showErrorMessage('GitHub PAT update failed.');
+    }
+}
+
 export async function fetchGitHubUsername(token: string|undefined): Promise<string | undefined> {
 
     if (!token) {

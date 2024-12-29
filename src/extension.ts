@@ -1,12 +1,14 @@
 import * as vscode from 'vscode';
 // import * as dotenv from 'dotenv';
-import { fetchGitHubUsername, getGitHubToken } from './credentials';
+import { fetchGitHubUsername, getGitHubToken, updateGitHubToken } from './credentials';
 import { getRepoAndBranch } from './credentials';
 import { saveResultToGist } from './gist';
 
 let endTime: Date | undefined;
 let githubUsername: string | undefined;
 let token: string | undefined;
+
+
 
 export async function activate(context: vscode.ExtensionContext) {
     try {
@@ -92,6 +94,10 @@ export async function activate(context: vscode.ExtensionContext) {
                 }
             }
         });
+
+        context.subscriptions.push(vscode.commands.registerCommand('trackyourpeas.updatePAT', async () => {
+            await updateGitHubToken(context);
+        }));
 
         context.subscriptions.push(startStopCommand);
         context.subscriptions.push(pauseCommand);
