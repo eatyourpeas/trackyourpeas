@@ -12,6 +12,11 @@ let token: string | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
     try {
+        // register the command to update the GitHub token before starting the extension
+        context.subscriptions.push(vscode.commands.registerCommand('trackyourpeas.updatePAT', async () => {
+            await updateGitHubToken(context);
+        }));
+
         const { repoName, branchName } = await getRepoAndBranch();
         token = await getGitHubToken(context=context);
         if (!token) {
@@ -100,9 +105,6 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         });
 
-        context.subscriptions.push(vscode.commands.registerCommand('trackyourpeas.updatePAT', async () => {
-            await updateGitHubToken(context);
-        }));
         context.subscriptions.push(startStopCommand);
         context.subscriptions.push(pauseCommand);
         context.subscriptions.push(startStop);
