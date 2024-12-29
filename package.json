@@ -2,7 +2,7 @@
   "name": "trackyourpeas",
   "displayName": "Track Your Peas",
   "description": "A VS Code extension to track your VSCode activity using Github gists.",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "publisher": "eatyourpeas",
   "author": {
     "name": "eatyourpeas",
@@ -46,11 +46,11 @@
     "commands": [
       {
         "command": "trackyourpeas.startStopTracking",
-        "title": "Start/Stop Tracking"
+        "title": "Trackyourpeas: Start/Stop Tracking"
       },
       {
         "command": "trackyourpeas.pauseTracking",
-        "title": "Pause/Resume Tracking"
+        "title": "Trackyourpeas: Pause/Resume Tracking"
       },
       {
         "command": "trackyourpeas.updatePAT",

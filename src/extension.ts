@@ -18,12 +18,12 @@ export async function activate(context: vscode.ExtensionContext) {
             vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
             return;
         }
-        githubUsername = await fetchGitHubUsername(token=token);
         const isValid = await validateGitHubToken(token);
         if (!isValid) {
             vscode.window.showErrorMessage('GitHub token is invalid. Please set a valid GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable. You can do this through the command palette (CMD+SHIFT+P) "Update GitHub PAT".');
             return;
         }
+        githubUsername = await fetchGitHubUsername(token=token);
         vscode.window.showInformationMessage(`Congratulations ${githubUsername}, your extension "trackyourpeas" is now active! Repo: ${repoName}, Branch: ${branchName}`);
 
         let tracking = false;
@@ -103,7 +103,6 @@ export async function activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(vscode.commands.registerCommand('trackyourpeas.updatePAT', async () => {
             await updateGitHubToken(context);
         }));
-
         context.subscriptions.push(startStopCommand);
         context.subscriptions.push(pauseCommand);
         context.subscriptions.push(startStop);
