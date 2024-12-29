@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 // import * as dotenv from 'dotenv';
-import { fetchGitHubUsername, getGitHubToken, updateGitHubToken } from './credentials';
+import { fetchGitHubUsername, getGitHubToken, updateGitHubToken , validateGitHubToken } from './credentials';
 import { getRepoAndBranch } from './credentials';
 import { saveResultToGist } from './gist';
 
@@ -14,9 +14,14 @@ export async function activate(context: vscode.ExtensionContext) {
     try {
         const { repoName, branchName } = await getRepoAndBranch();
         token = await getGitHubToken(context=context);
-        githubUsername = await fetchGitHubUsername(token=token);
         if (!token) {
             vscode.window.showErrorMessage('GitHub token is not set. Please set the GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable.');
+            return;
+        }
+        githubUsername = await fetchGitHubUsername(token=token);
+        const isValid = await validateGitHubToken(token);
+        if (!isValid) {
+            vscode.window.showErrorMessage('GitHub token is invalid. Please set a valid GITHUB_TOKEN_TRACK_YOUR_PEAS environment variable. You can do this through the command palette (CMD+SHIFT+P) "Update GitHub PAT".');
             return;
         }
         vscode.window.showInformationMessage(`Congratulations ${githubUsername}, your extension "trackyourpeas" is now active! Repo: ${repoName}, Branch: ${branchName}`);
